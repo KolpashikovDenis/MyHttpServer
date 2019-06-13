@@ -8,6 +8,8 @@ import java.net.InetSocketAddress;
 
 public class Main {
 
+    static int n = 0;
+
     public static void main(String[] args) throws Exception {
         HttpServer server = HttpServer.create(new InetSocketAddress(10001), 0);
         server.createContext("/hello", new HelloHandler());
@@ -38,7 +40,8 @@ public class Main {
     static class UploadHandler implements HttpHandler{
         @Override
         public void handle(HttpExchange he) throws IOException {
-            String fTmp = "tmp.tmp";
+            n += 1;
+            String fTmp = String.format("tmp_%d.tmp", n);
 
             Headers rh = he.getResponseHeaders();
             rh.set("Content-Type", "text/plain");
@@ -74,7 +77,7 @@ public class Main {
             String fName = line.substring(line.indexOf("filename=")+10, line.length()-1);
             RandomAccessFile w = new RandomAccessFile(fName, "rw");
             r.readLine();
-            r.readLine();
+//            r.readLine();
 
             byte bb;
             StringBuilder sb = new StringBuilder();
@@ -91,6 +94,8 @@ public class Main {
             }
             r.close();
             w.close();
-        }
+            File file = new File(fTmp);
+            file.delete();
+    }
     }
 }
