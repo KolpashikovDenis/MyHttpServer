@@ -5,12 +5,26 @@ import com.sun.net.httpserver.HttpServer;
 
 import java.io.*;
 import java.net.InetSocketAddress;
+import java.util.List;
 
 public class Main {
 
     static int n = 0;
+    static String folder = "xml";
 
     public static void main(String[] args) throws Exception {
+        File dir = new File(folder);
+        if(!dir.exists()){
+            dir.mkdir();
+        } else {
+            File[] files = dir.listFiles();
+            if (files.length > 0){
+                for(File f: files){
+                    f.delete();
+                }
+            }
+        }
+
         HttpServer server = HttpServer.create(new InetSocketAddress(10001), 0);
         server.createContext("/hello", new HelloHandler());
         server.createContext("/upload", new UploadHandler());
@@ -41,7 +55,7 @@ public class Main {
         @Override
         public void handle(HttpExchange he) throws IOException {
             n += 1;
-            String fTmp = String.format("tmp_%d.tmp", n);
+            String fTmp = String.format(folder+"\\tmp_%d.tmp", n);
 
             Headers rh = he.getResponseHeaders();
             rh.set("Content-Type", "text/plain");
@@ -74,7 +88,7 @@ public class Main {
 
             String key = r.readLine();
             String line = r.readLine();
-            String fName = line.substring(line.indexOf("filename=")+10, line.length()-1);
+            String fName = folder + "\\"+line.substring(line.indexOf("filename=")+10, line.length()-1);
             RandomAccessFile w = new RandomAccessFile(fName, "rw");
             r.readLine();
 //            r.readLine();
